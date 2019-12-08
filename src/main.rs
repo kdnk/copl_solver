@@ -1,30 +1,31 @@
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 enum Nat {
     Z,
     S(Box<Nat>),
 }
 
+#[derive(PartialEq, Debug)]
 enum ProofPlusIs {
     PZero,
     PSucc(Box<ProofPlusIs>),
 }
 
 impl ProofPlusIs {
-    pub fn check(&self, a: &Nat, b: &Nat, c: &Nat, proof: &ProofPlusIs) -> bool {
-        match proof {
+    pub fn check(&self, a: &Nat, b: &Nat, c: &Nat) -> bool {
+        match self {
             ProofPlusIs::PZero => a == &Nat::Z && b == c,
             ProofPlusIs::PSucc(proof1) => match (a, c) {
-                (Nat::S(nat0), Nat::S(nat1)) => self.check(nat0, b, nat1, proof1),
+                (Nat::S(nat0), Nat::S(nat1)) => proof1.check(nat0, b, nat1),
                 _ => false,
             },
         }
     }
 
-    pub fn find(&self, a: &Nat, b: &Nat, c: &Nat) -> Option<ProofPlusIs> {
+    pub fn find(a: &Nat, b: &Nat, c: &Nat) -> Option<Self> {
         match (a, c) {
             (Nat::Z, _) => Some(ProofPlusIs::PZero),
             // S(Z) plus S(Z) is S(S(Z))
-            (Nat::S(nat1), Nat::S(nat2)) => match self.find(nat1, b, nat2) {
+            (Nat::S(nat1), Nat::S(nat2)) => match Self::find(nat1, b, nat2) {
                 // Z plus S(Z) is S(Z)
                 None => None,
                 Some(proof0) => Some(ProofPlusIs::PSucc(Box::new(proof0))), // <- なんでここを box にしないといけない？
@@ -35,3 +36,23 @@ impl ProofPlusIs {
 }
 
 fn main() {}
+
+#[test]
+fn plus() {
+    let proof = ProofPlusIs::find(
+        &Nat::S(Box::new(Nat::Z)),
+        &Nat::S(Box::new(Nat::Z)),
+        &Nat::S(Box::new(Nat::S(Box::new(Nat::Z)))),
+    );
+    assert_eq!(
+        proof,
+        Some(ProofPlusIs::PSucc(Box::new(ProofPlusIs::PZero)))
+    );
+
+    let checked = proof.unwrap().check(
+        &Nat::S(Box::new(Nat::Z)),
+        &Nat::S(Box::new(Nat::Z)),
+        &Nat::S(Box::new(Nat::S(Box::new(Nat::Z)))),
+    );
+    assert_eq!(checked, true);
+}
