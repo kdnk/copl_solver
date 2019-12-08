@@ -38,21 +38,30 @@ impl ProofPlusIs {
 fn main() {}
 
 #[test]
-fn plus() {
-    let proof = ProofPlusIs::find(
-        &Nat::S(Box::new(Nat::Z)),
-        &Nat::S(Box::new(Nat::Z)),
-        &Nat::S(Box::new(Nat::S(Box::new(Nat::Z)))),
-    );
+fn succ() {
+    let n1 = Nat::S(Box::new(Nat::Z));
+    let n2 = Nat::S(Box::new(Nat::Z));
+    let n3 = Nat::S(Box::new(Nat::S(Box::new(Nat::Z))));
+    let proof = ProofPlusIs::find(&n1, &n2, &n3);
+
     assert_eq!(
         proof,
         Some(ProofPlusIs::PSucc(Box::new(ProofPlusIs::PZero)))
     );
 
-    let checked = proof.unwrap().check(
-        &Nat::S(Box::new(Nat::Z)),
-        &Nat::S(Box::new(Nat::Z)),
-        &Nat::S(Box::new(Nat::S(Box::new(Nat::Z)))),
-    );
+    let checked = proof.unwrap().check(&n1, &n2, &n3);
+    assert_eq!(checked, true);
+}
+
+#[test]
+fn zero() {
+    let n1 = Nat::Z;
+    let n2 = Nat::S(Box::new(Nat::Z));
+    let n3 = Nat::S(Box::new(Nat::Z));
+    let proof = ProofPlusIs::find(&n1, &n2, &n3);
+
+    assert_eq!(proof, Some(ProofPlusIs::PZero));
+
+    let checked = proof.unwrap().check(&n1, &n2, &n3);
     assert_eq!(checked, true);
 }
