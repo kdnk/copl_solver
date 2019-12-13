@@ -48,7 +48,26 @@ mod tests {
 
     #[test]
     fn t_succ() {
-        unimplemented!()
+        let n2_1 = Nat::s(Nat::s(Nat::Z));
+        let n1 = Nat::s(Nat::Z);
+        let n2_2 = Nat::s(Nat::s(Nat::Z));
+        let proof = ProofTimeIs::find(&n2_1, &n1, &n2_2);
+
+        assert_eq!(
+            proof,
+            Some(ProofTimeIs::TSucc(
+                Box::new(ProofTimeIs::TSucc(
+                    Box::new(ProofTimeIs::TZero),
+                    Box::new(ProofPlusIs::PSucc(Box::new(ProofPlusIs::PZero))),
+                    Nat::Z,
+                )),
+                Box::new(ProofPlusIs::PSucc(Box::new(ProofPlusIs::PZero))),
+                Nat::s(Nat::Z)
+            ))
+        );
+
+        let checked = proof.unwrap().check(&n2_1, &n1, &n2_2);
+        assert_eq!(checked, true);
     }
 
     #[test]
