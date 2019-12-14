@@ -32,8 +32,8 @@ impl ProofPlusIs {
         match a {
             Nat::Z => Some((Self::PZero, b.clone())),
             Nat::S(nat1) => {
-                let (proof, nat1) = Self::find_n4(nat1, b)?;
-                Some((Self::PSucc(Box::new(proof)), Nat::s(nat1)))
+                let (proof, nat) = Self::find_n4(nat1, b)?;
+                Some((Self::PSucc(Box::new(proof)), Nat::s(nat)))
             }
         }
     }
