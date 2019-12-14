@@ -22,7 +22,7 @@ impl ProofPlusIs {
             (Nat::Z, _) if b == c => Some(Self::PZero),
             (Nat::S(nat1), Nat::S(nat3)) => match Self::find(nat1, b, nat3) {
                 None => None,
-                Some(proof0) => Some(Self::PSucc(Box::new(proof0))), // <- なんでここを box にしないといけない？
+                Some(proof0) => Some(Self::PSucc(Box::new(proof0))),
             },
             _ => None,
         }
@@ -61,10 +61,7 @@ impl ProofTimeIs {
     pub fn find(a: &Nat, b: &Nat, c: &Nat) -> Option<Self> {
         match (a, b, c) {
             (Nat::Z, _, Nat::Z) => Some(Self::TZero),
-            // exp: S(S(Z)) times S(Z) is S(S(Z))
             (Nat::S(nat1), nat2, nat4) => {
-                // proof1: S(Z) times S(Z) is S(Z)
-                // proof2: S(Z) plus S(Z) is S(S(Z))
                 let (proof1, nat3) = Self::find_n3(nat1, nat2)?;
                 let proof2 = ProofPlusIs::find(nat2, &nat3, nat4)?;
 
@@ -77,10 +74,7 @@ impl ProofTimeIs {
     pub fn find_n3(a: &Nat, b: &Nat) -> Option<(Self, Nat)> {
         match a {
             Nat::Z => Some((Self::TZero, Nat::Z)),
-            // exp: S(S(Z)) times S(Z) is S(S(Z))
             Nat::S(nat1) => {
-                // proof1: S(Z) times S(Z) is S(Z)
-                // proof2: S(Z) plus S(Z) is S(S(Z))
                 let (proof1, nat3) = Self::find_n3(nat1, b)?;
                 let (proof2, nat4) = ProofPlusIs::find_n4(b, &nat3)?;
 
