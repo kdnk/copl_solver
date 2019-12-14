@@ -29,10 +29,7 @@ impl ProofCompareNat1 {
                 Some((Self::LSucc, None))
             }
             (nat1, nat3) => {
-                let (proof, nat) = Self::find_n2(&Nat::s(nat1.clone()), nat3)?;
-                if nat == None {
-                    return None;
-                }
+                let (proof, _nat) = Self::find_n2(&Nat::s(nat1.clone()), nat3)?;
                 let found_proof = Self::LTrans(Box::new(Self::LSucc), Box::new(proof));
                 Some((found_proof, Some(Nat::s(nat1.clone()))))
             }
@@ -72,6 +69,7 @@ mod tests {
         assert_ne!(result, None);
         let (proof, nat) = result.unwrap();
         let n3 = Nat::s(Nat::s(Nat::s(Nat::Z)));
+        assert_eq!(nat, Some(n3));
         assert_eq!(
             proof,
             ProofCompareNat1::LTrans(
@@ -79,6 +77,5 @@ mod tests {
                 Box::new(ProofCompareNat1::LSucc),
             )
         );
-        assert_eq!(nat, Some(n3));
     }
 }
