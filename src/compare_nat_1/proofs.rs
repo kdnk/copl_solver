@@ -72,9 +72,8 @@ mod tests {
     fn test_find_n2_2() {
         let n2 = Nat::s(Nat::s(Nat::Z));
         let n3 = Nat::s(Nat::s(Nat::s(Nat::Z)));
-        let (proof, nat) = ProofCompareNat1::find_n2(&n2, &n3);
+        let (proof, _nat) = ProofCompareNat1::find_n2(&n2, &n3);
         assert_eq!(proof, Some(ProofCompareNat1::LSucc));
-        assert_eq!(nat, Some(n2));
     }
 
     #[test]
