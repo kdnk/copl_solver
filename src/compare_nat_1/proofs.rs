@@ -24,6 +24,7 @@ impl ProofCompareNat1 {
 
     pub fn find_n2(n1: &Nat, n3: &Nat) -> Option<(Self, Option<Nat>)> {
         match (n1, n3) {
+            (nat1, nat3) if nat1 == nat3 => None,
             (nat1, Nat::S(nat3)) if Box::new(nat1.clone()) == nat3.clone() => {
                 Some((Self::LSucc, None))
             }
