@@ -9,14 +9,22 @@ pub enum ProofCompareNat1 {
 impl ProofCompareNat1 {
     pub fn find(n1: &Nat, n3: &Nat) -> Option<Self> {
         match (n1, n3) {
-            (nat1, Nat::S(nat3)) if Box::new(nat1.clone()) == nat3.clone() => Some(Self::LSucc),
+            (nat1, Nat::S(nat3)) if Box::new(nat1.clone()) == nat3.clone() => {
+                let proof = Some(Self::LSucc);
+                println!(
+                    "n1: {:?}, n3: {:?}, proof: {:?}",
+                    nat1,
+                    Nat::S(nat3.clone()),
+                    proof
+                );
+                proof
+            }
             (nat1, nat3) => {
                 let (proof1, n2) = Self::find_n2(nat1, nat3)?;
-                if n2 == None {
-                    return None;
-                }
-                let _proof2 = Self::find(&n2.unwrap(), nat3)?;
-                // let found_proof = Self::LTrans(Box::new(proof1), Box::new(proof2));
+                println!(
+                    "nat1: {:?}, nat3: {:?}, n2: {:?}, proof: {:?}",
+                    nat1, nat3, n2, proof1
+                );
                 let found_proof = proof1;
                 Some(found_proof)
             }
