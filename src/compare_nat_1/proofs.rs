@@ -15,8 +15,9 @@ impl ProofCompareNat1 {
                 if n2 == None {
                     return None;
                 }
-                let proof2 = Self::find(&n2.unwrap(), nat3)?;
-                let found_proof = Self::LTrans(Box::new(proof1), Box::new(proof2));
+                let _proof2 = Self::find(&n2.unwrap(), nat3)?;
+                // let found_proof = Self::LTrans(Box::new(proof1), Box::new(proof2));
+                let found_proof = proof1;
                 Some(found_proof)
             }
         }
@@ -40,6 +41,9 @@ impl ProofCompareNat1 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    //  test for find_2
+    // -----------------------------------------------
 
     #[test]
     fn test_find_n2_1() {
@@ -76,6 +80,60 @@ mod tests {
                 Box::new(ProofCompareNat1::LSucc),
                 Box::new(ProofCompareNat1::LSucc),
             )
+        );
+    }
+
+    //  test for find
+    // -----------------------------------------------
+
+    #[test]
+    fn test_find_1() {
+        let n1 = Nat::s(Nat::Z);
+        let n2 = Nat::s(Nat::s(Nat::Z));
+        let proof = ProofCompareNat1::find(&n1, &n2);
+
+        assert_eq!(proof, Some(ProofCompareNat1::LSucc));
+    }
+
+    #[test]
+    fn test_find_2() {
+        let n0_1 = Nat::Z;
+        let n0_2 = Nat::Z;
+        let proof = ProofCompareNat1::find(&n0_1, &n0_2);
+
+        assert_eq!(proof, None);
+    }
+
+    #[test]
+    fn test_find_3() {
+        let n2 = Nat::s(Nat::s(Nat::Z));
+        let n4 = Nat::s(Nat::s(Nat::s(Nat::s(Nat::Z))));
+        let proof = ProofCompareNat1::find(&n2, &n4);
+
+        assert_eq!(
+            proof,
+            Some(ProofCompareNat1::LTrans(
+                Box::new(ProofCompareNat1::LSucc),
+                Box::new(ProofCompareNat1::LSucc),
+            ))
+        );
+    }
+
+    #[test]
+    fn test_find_4() {
+        let n2 = Nat::s(Nat::s(Nat::Z));
+        let n5 = Nat::s(Nat::s(Nat::s(Nat::s(Nat::s(Nat::Z)))));
+        let proof = ProofCompareNat1::find(&n2, &n5);
+
+        assert_eq!(
+            proof,
+            Some(ProofCompareNat1::LTrans(
+                Box::new(ProofCompareNat1::LSucc),
+                Box::new(ProofCompareNat1::LTrans(
+                    Box::new(ProofCompareNat1::LSucc),
+                    Box::new(ProofCompareNat1::LSucc),
+                ))
+            ))
         );
     }
 }
