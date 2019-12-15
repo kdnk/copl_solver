@@ -66,4 +66,12 @@ mod tests {
             )))
         );
     }
+
+    #[test]
+    fn test_find_4() {
+        let n3 = Nat::s(Nat::s(Nat::s(Nat::Z)));
+        let n2 = Nat::s(Nat::s(Nat::Z));
+        let proof = ProofCompareNat2::find(&n3, &n2);
+        assert_eq!(proof, None);
+    }
 }
