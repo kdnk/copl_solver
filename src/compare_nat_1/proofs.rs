@@ -9,7 +9,7 @@ pub enum ProofCompareNat1 {
 impl ProofCompareNat1 {
     pub fn find(n1: &Nat, n3: &Nat) -> Option<Self> {
         match (n1, n3) {
-            (nat1, Nat::S(nat3)) if Box::new(nat1.clone()) == nat3.clone() => {
+            (nat1, Nat::S(nat3)) if nat1 == &**nat3 => {
                 let proof = Some(Self::LSucc);
                 println!(
                     "n1: {:?}, n3: {:?}, proof: {:?}",
