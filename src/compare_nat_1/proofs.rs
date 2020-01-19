@@ -3,44 +3,30 @@ use super::super::nat::Nat;
 #[derive(PartialEq, Debug, Clone)]
 pub enum ProofCompareNat1 {
     LSucc,
-    LTrans(Box<ProofCompareNat1>, Box<ProofCompareNat1>),
+    LTrans(Box<ProofCompareNat1>, Box<ProofCompareNat1>, Nat),
 }
 
 impl ProofCompareNat1 {
     pub fn find(n1: &Nat, n3: &Nat) -> Option<Self> {
         match (n1, n3) {
-            (nat1, Nat::S(nat3)) if Box::new(nat1.clone()) == nat3.clone() => {
+            (nat1, Nat::S(nat3)) if nat1 == &**nat3 => {
                 let proof = Some(Self::LSucc);
-                println!(
-                    "n1: {:?}, n3: {:?}, proof: {:?}",
-                    nat1,
-                    Nat::S(nat3.clone()),
-                    proof
-                );
                 proof
             }
             (nat1, nat3) => {
-                let (proof1, n2) = Self::find_n2(nat1, nat3)?;
-                println!(
-                    "nat1: {:?}, nat3: {:?}, n2: {:?}, proof: {:?}",
-                    nat1, nat3, n2, proof1
-                );
-                let found_proof = proof1;
-                Some(found_proof)
+                let (proof2, nat2) = Self::find_n2(nat3)?;
+                let proof1 = Self::find(nat1, &nat2)?;
+                Some(Self::LTrans(Box::new(proof1), Box::new(proof2), nat2))
             }
         }
     }
 
-    pub fn find_n2(n1: &Nat, n3: &Nat) -> Option<(Self, Option<Nat>)> {
-        match (n1, n3) {
-            (nat1, nat3) if nat1 == nat3 => None,
-            (nat1, Nat::S(nat3)) if Box::new(nat1.clone()) == nat3.clone() => {
-                Some((Self::LSucc, None))
-            }
-            (nat1, nat3) => {
-                let (proof, _nat) = Self::find_n2(&Nat::s(nat1.clone()), nat3)?;
-                let found_proof = Self::LTrans(Box::new(Self::LSucc), Box::new(proof));
-                Some((found_proof, Some(Nat::s(nat1.clone()))))
+    pub fn find_n2(n3: &Nat) -> Option<(Self, Nat)> {
+        match n3 {
+            Nat::Z => None,
+            Nat::S(nat2) => {
+                let proof = Self::LSucc;
+                Some((proof, *nat2.clone()))
             }
         }
     }
@@ -50,22 +36,21 @@ impl ProofCompareNat1 {
 mod tests {
     use super::*;
 
-    //  test for find_2
-    // -----------------------------------------------
+    // //  test for find_2
+    // // -----------------------------------------------
 
     #[test]
     fn test_find_n2_1() {
         let z_1 = Nat::Z;
         let z_2 = Nat::Z;
-        let result = ProofCompareNat1::find_n2(&z_1, &z_2);
+        let result = ProofCompareNat1::find_n2(&z_2);
         assert_eq!(result, None);
     }
 
     #[test]
     fn test_find_n2_2() {
-        let n2 = Nat::s(Nat::s(Nat::Z));
         let n3 = Nat::s(Nat::s(Nat::s(Nat::Z)));
-        let result = ProofCompareNat1::find_n2(&n2, &n3);
+        let result = ProofCompareNat1::find_n2(&n3);
 
         assert_ne!(result, None);
         let (proof, _nat) = result.unwrap();
@@ -74,21 +59,12 @@ mod tests {
 
     #[test]
     fn test_find_n2_3() {
-        let n2 = Nat::s(Nat::s(Nat::Z));
         let n4 = Nat::s(Nat::s(Nat::s(Nat::s(Nat::Z))));
-        let result = ProofCompareNat1::find_n2(&n2, &n4);
+        let result = ProofCompareNat1::find_n2(&n4);
 
         assert_ne!(result, None);
-        let (proof, nat) = result.unwrap();
-        let n3 = Nat::s(Nat::s(Nat::s(Nat::Z)));
-        assert_eq!(nat, Some(n3));
-        assert_eq!(
-            proof,
-            ProofCompareNat1::LTrans(
-                Box::new(ProofCompareNat1::LSucc),
-                Box::new(ProofCompareNat1::LSucc),
-            )
-        );
+        let (proof, _nat) = result.unwrap();
+        assert_eq!(proof, ProofCompareNat1::LSucc);
     }
 
     //  test for find
@@ -118,11 +94,13 @@ mod tests {
         let n4 = Nat::s(Nat::s(Nat::s(Nat::s(Nat::Z))));
         let proof = ProofCompareNat1::find(&n2, &n4);
 
+        let n3 = Nat::s(Nat::s(Nat::s(Nat::Z)));
         assert_eq!(
             proof,
             Some(ProofCompareNat1::LTrans(
                 Box::new(ProofCompareNat1::LSucc),
                 Box::new(ProofCompareNat1::LSucc),
+                n3
             ))
         );
     }
@@ -131,17 +109,22 @@ mod tests {
     fn test_find_4() {
         let n2 = Nat::s(Nat::s(Nat::Z));
         let n5 = Nat::s(Nat::s(Nat::s(Nat::s(Nat::s(Nat::Z)))));
+
         let proof = ProofCompareNat1::find(&n2, &n5);
 
+        let n4 = Nat::s(Nat::s(Nat::s(Nat::s(Nat::Z))));
+        let n3 = Nat::s(Nat::s(Nat::s(Nat::Z)));
         assert_eq!(
             proof,
             Some(ProofCompareNat1::LTrans(
-                Box::new(ProofCompareNat1::LSucc),
                 Box::new(ProofCompareNat1::LTrans(
                     Box::new(ProofCompareNat1::LSucc),
                     Box::new(ProofCompareNat1::LSucc),
-                ))
-            ))
+                    n3,
+                )),
+                Box::new(ProofCompareNat1::LSucc),
+                n4
+            )),
         );
     }
 }
