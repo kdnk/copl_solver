@@ -6,45 +6,7 @@ pub enum ProofCompareNat1 {
     LTrans(Box<ProofCompareNat1>, Box<ProofCompareNat1>),
 }
 
-impl ProofCompareNat1 {
-    pub fn find(n1: &Nat, n3: &Nat) -> Option<Self> {
-        match (n1, n3) {
-            (nat1, Nat::S(nat3)) if nat1 == &**nat3 => {
-                let proof = Some(Self::LSucc);
-                println!(
-                    "n1: {:?}, n3: {:?}, proof: {:?}",
-                    nat1,
-                    Nat::S(nat3.clone()),
-                    proof
-                );
-                proof
-            }
-            (nat1, nat3) => {
-                let (proof1, n2) = Self::find_n2(nat1, nat3)?;
-                println!(
-                    "nat1: {:?}, nat3: {:?}, n2: {:?}, proof: {:?}",
-                    nat1, nat3, n2, proof1
-                );
-                let found_proof = proof1;
-                Some(found_proof)
-            }
-        }
-    }
-
-    pub fn find_n2(n1: &Nat, n3: &Nat) -> Option<(Self, Option<Nat>)> {
-        match (n1, n3) {
-            (nat1, nat3) if nat1 == nat3 => None,
-            (nat1, Nat::S(nat3)) if Box::new(nat1.clone()) == nat3.clone() => {
-                Some((Self::LSucc, None))
-            }
-            (nat1, nat3) => {
-                let (proof, _nat) = Self::find_n2(&Nat::s(nat1.clone()), nat3)?;
-                let found_proof = Self::LTrans(Box::new(Self::LSucc), Box::new(proof));
-                Some((found_proof, Some(Nat::s(nat1.clone()))))
-            }
-        }
-    }
-}
+impl ProofCompareNat1 {}
 
 #[cfg(test)]
 mod tests {
